@@ -23,11 +23,31 @@ openai.api_key = st.secrets["openai_api_key"]  # Add this key in .streamlit/secr
 # ----------------------------
 # LOAD CNN MODEL (CACHED)
 # ----------------------------
+import os
+import urllib.request
+import tensorflow as tf
+import streamlit as st
+
+# Define model path
+model_path = "emotion_model.h5"
+
+# Download the model if not present
+if not os.path.exists(model_path):
+    print("Downloading model...")
+    urllib.request.urlretrieve(
+        "https://huggingface.co/Slytherinsoul/emotion-model/resolve/main/emotion_model.h5",
+        model_path
+    )
+    print("Download complete.")
+
+# Cache the model loading
 @st.cache_resource
 def load_model():
-    return tf.keras.models.load_model("emotion_model.h5")  # or .h5 or .keras
+    return tf.keras.models.load_model(model_path)
 
+# Load the model
 model = load_model()
+
 
 # Emotion labels
 class_names = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
